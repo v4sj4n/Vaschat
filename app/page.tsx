@@ -1,101 +1,248 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useChat } from "@ai-sdk/react";
+import { useEffect, useState, useRef } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { BrainCircuit, RotateCcw, Send, Square, Loader2 } from "lucide-react";
+import { titleCaser } from "@/lib/utils";
+import { MemoizedMarkdown } from "@/components/ui/memoized-markdown";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Separator } from "@/components/ui/separator";
+
+export default function Chat() {
+  const [provider, setProvider] = useState(
+    localStorage.getItem("provider") || "openai"
+  );
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    setMessages,
+    stop,
+    status,
+    reload,
+  } = useChat({
+    id: "chat",
+    experimental_throttle: 50,
+    api: "/api/chat",
+    body: { provider },
+  });
+
+  const isLoading = ["streaming", "submitted"].includes(status);
+  const isError = status === "error";
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
+  useEffect(() => {
+    setMessages([]);
+  }, [provider, setMessages]);
+
+  const scrollToBottom = () => {
+    if (scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector(
+        "[data-radix-scroll-area-viewport]"
+      );
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
+    }
+
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="max-w-3xl mx-auto min-h-screen flex flex-col py-6 px-4 md:px-0 relative">
+      <Card className="flex-grow shadow-md">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-xl font-semibold">Vaschat</CardTitle>
+          <Separator className="mt-2" />
+        </CardHeader>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        <CardContent className="flex-1 p-0">
+          <ScrollArea className="flex-1 pr-4 h-[75vh]" ref={scrollAreaRef}>
+            <div className="p-4">
+              {messages.length === 0 ? (
+                <div className="h-64 flex items-center justify-center text-muted-foreground">
+                  <p>Start a new conversation</p>
+                </div>
+              ) : (
+                messages.map((m) => (
+                  <div key={m.id} className="flex gap-3 mb-6">
+                    <Avatar className="h-8 w-8 mt-1">
+                      <AvatarFallback>
+                        {m.role === "user" ? "U" : "AI"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold mb-1">
+                        {m.role === "user" ? "You" : titleCaser(provider)}
+                      </p>
+
+                      {m.parts
+                        ? m.parts.map((part, idx) => {
+                            if (part.type === "reasoning") {
+                              return (
+                                <Accordion
+                                  key={`reasoning-${idx}`}
+                                  type="single"
+                                  collapsible
+                                  className="w-full text-sm mb-2 border rounded-md"
+                                >
+                                  <AccordionItem
+                                    value={`reasoning-${idx}`}
+                                    className="border-none"
+                                  >
+                                    <AccordionTrigger className="flex gap-2 items-center justify-between text-sm font-medium px-3 py-2 rounded-md">
+                                      <div className="flex items-center gap-2">
+                                        <BrainCircuit className="h-4 w-4" />
+                                        <span>Reasoning</span>
+                                      </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="p-3 bg-secondary/20 rounded-b-md">
+                                      <MemoizedMarkdown
+                                        id={`${m.id}-reasoning-${idx}`}
+                                        content={part.reasoning}
+                                      />
+                                    </AccordionContent>
+                                  </AccordionItem>
+                                </Accordion>
+                              );
+                            } else if (part.type === "text") {
+                              return (
+                                <div
+                                  key={`text-${idx}`}
+                                  className="prose prose-sm max-w-none"
+                                >
+                                  <MemoizedMarkdown
+                                    id={`${m.id}-text-${idx}`}
+                                    content={part.text}
+                                  />
+                                </div>
+                              );
+                            } else {
+                              return null;
+                            }
+                          })
+                        : m.content && (
+                            <div className="prose prose-sm max-w-none">
+                              <MemoizedMarkdown id={m.id} content={m.content} />
+                            </div>
+                          )}
+                    </div>
+                  </div>
+                ))
+              )}
+              {/* Invisible element for auto-scrolling */}
+              <div ref={messagesEndRef} />
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
+
+      <div className="mt-4">
+        <form
+          onSubmit={(e) => {
+            handleSubmit(e);
+            // Additional scroll after submission
+            setTimeout(scrollToBottom, 100);
+          }}
+          className="relative w-full mx-auto"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <div className="border rounded-lg shadow-sm bg-card p-2">
+            <div className="flex gap-2 items-center">
+              <Select
+                value={provider}
+                onValueChange={(val) => {
+                  localStorage.setItem("provider", val);
+                  setProvider(val);
+                }}
+              >
+                <SelectTrigger className="w-[110px]">
+                  <SelectValue placeholder="Model" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="openai">OpenAI</SelectItem>
+                  <SelectItem value="anthropic">Anthropic</SelectItem>
+                  <SelectItem value="deepseek">DeepSeek</SelectItem>
+                  <SelectItem value="mistral">Mistral</SelectItem>
+                  <SelectItem value="google">Google</SelectItem>
+                  <SelectItem value="cohere">Cohere</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Input
+                ref={inputRef}
+                value={input}
+                onChange={handleInputChange}
+                placeholder={`Chat with ${titleCaser(provider)}...`}
+                className="flex-1"
+                disabled={isLoading}
+              />
+
+              {status === "ready" ? (
+                <Button type="submit" size="sm">
+                  <Send className="h-4 w-4 mr-2" />
+                  Send
+                </Button>
+              ) : isLoading ? (
+                <Button variant="destructive" onClick={stop} size="sm">
+                  <Square className="h-4 w-4 mr-2" />
+                  Stop
+                </Button>
+              ) : (
+                <Button onClick={() => reload()} size="sm" variant="outline">
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  Retry
+                </Button>
+              )}
+            </div>
+
+            {isLoading && (
+              <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                <span>Generating response...</span>
+              </div>
+            )}
+
+            {isError && (
+              <div className="text-xs text-destructive mt-2">
+                An error occurred. Please try again.
+              </div>
+            )}
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
