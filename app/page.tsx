@@ -5,6 +5,12 @@ import { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import claudeIcon from "../assets/claude.svg";
+import geminiIcon from "../assets/gemini.svg";
+import mistralIcon from "../assets/mistral.svg";
+import cohereIcon from "../assets/cohere.svg";
+import openaiIcon from "../assets/deepseek.svg";
+import deepseekIcon from "../assets/openai.svg";
 import {
   Select,
   SelectContent,
@@ -24,6 +30,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
+import { AvatarImage } from "@radix-ui/react-avatar";
 
 export default function Chat() {
   const [provider, setProvider] = useState(
@@ -188,16 +195,76 @@ export default function Chat() {
                   setProvider(val);
                 }}
               >
-                <SelectTrigger className="w-[110px]">
+                <SelectTrigger className="w-[150px]">
                   <SelectValue placeholder="Model" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="openai">OpenAI</SelectItem>
-                  <SelectItem value="anthropic">Anthropic</SelectItem>
-                  <SelectItem value="deepseek">DeepSeek</SelectItem>
-                  <SelectItem value="mistral">Mistral</SelectItem>
-                  <SelectItem value="google">Google</SelectItem>
-                  <SelectItem value="cohere">Cohere</SelectItem>
+                  <SelectItem value="openai">
+                    <Avatar className="h-4">
+                      <AvatarImage
+                        className="text-foreground dark:prose-invert dark:invert"
+                        src={openaiIcon.src}
+                        alt="Openai"
+                      />
+                      <AvatarFallback>CL</AvatarFallback>
+                    </Avatar>
+                    OpenAI
+                  </SelectItem>
+                  <SelectItem value="anthropic">
+                    <Avatar className="h-4">
+                      <AvatarImage
+                        className="text-foreground dark:prose-invert dark:invert"
+                        src={claudeIcon.src}
+                        alt="Claude"
+                      />
+                      <AvatarFallback>CL</AvatarFallback>
+                    </Avatar>
+                    Claude
+                  </SelectItem>
+                  <SelectItem value="deepseek">
+                    <Avatar className="h-4">
+                      <AvatarImage
+                        className="text-foreground dark:prose-invert dark:invert"
+                        src={deepseekIcon.src}
+                        alt="Deepseek"
+                      />
+                      <AvatarFallback>CL</AvatarFallback>
+                    </Avatar>
+                    DeepSeek
+                  </SelectItem>
+                  <SelectItem value="mistral">
+                    <Avatar className="h-4">
+                      <AvatarImage
+                        className="text-foreground dark:prose-invert dark:invert"
+                        src={mistralIcon.src}
+                        alt="Mistral"
+                      />
+                      <AvatarFallback>CL</AvatarFallback>
+                    </Avatar>
+                    Mistral
+                  </SelectItem>
+                  <SelectItem value="google">
+                    <Avatar className="h-4">
+                      <AvatarImage
+                        className="text-foreground dark:prose-invert dark:invert"
+                        src={geminiIcon.src}
+                        alt="Gemini"
+                      />
+                      <AvatarFallback>Gemini</AvatarFallback>
+                    </Avatar>
+                    Google
+                  </SelectItem>
+                  <SelectItem value="cohere">
+                    <Avatar className="h-4">
+                      <AvatarImage
+                        className="text-foreground dark:prose-invert dark:invert"
+                        src={cohereIcon.src}
+                        alt="Cohere"
+                      />
+                      <AvatarFallback>CL</AvatarFallback>
+                    </Avatar>
+                    Cohere
+                  </SelectItem>
                 </SelectContent>
               </Select>
 

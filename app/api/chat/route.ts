@@ -7,12 +7,12 @@ import { google } from "@ai-sdk/google";
 import { streamText } from "ai";
 
 const models = {
-  openai: openai("gpt-4-turbo"),
+  openai: openai("o3-mini"),
   anthropic: anthropic("claude-3-7-sonnet-20250219"),
   deepseek: deepseek("deepseek-reasoner"),
   mistral: mistral("mistral-large-latest"),
   cohere: cohere("command-r-plus"),
-  google: google("gemini-2.0-flash-exp"),
+  google: google("gemini-2.0-flash-thinking-exp-01-21"),
 };
 
 export async function POST(req: Request) {
@@ -35,6 +35,9 @@ export async function POST(req: Request) {
     messages,
     providerOptions: {
       anthropic: {
+        thinking: { type: "enabled", budgetTokens: 12000 },
+      },
+      google: {
         thinking: { type: "enabled", budgetTokens: 12000 },
       },
     },
