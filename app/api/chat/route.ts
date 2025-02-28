@@ -7,7 +7,7 @@ import { google } from "@ai-sdk/google";
 import { streamText } from "ai";
 
 const models = {
-  openai: openai("o3-mini"),
+  openai: openai("gpt-4o-mini"),
   anthropic: anthropic("claude-3-7-sonnet-20250219"),
   deepseek: deepseek("deepseek-reasoner"),
   mistral: mistral("mistral-large-latest"),
