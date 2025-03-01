@@ -11,3 +11,12 @@ export const titleCaser = (str: string) => {
     (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
   );
 };
+
+export const saveToLocalStorage = (key: string, value: string) => {
+  try {
+    localStorage
+      .setItem(key, value);
+  } catch (error) {
+    console.error(error);
+  }
+};

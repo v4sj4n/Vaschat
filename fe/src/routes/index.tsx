@@ -10,8 +10,6 @@ function Index() {
   return (
   
 <>
-
-      {/* Hero Section */}
       <main className="container flex flex-col items-center justify-center flex-1 px-4 text-center gap-10 py-16">
         <div className="space-y-6 max-w-3xl">
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">

@@ -10,15 +10,15 @@ import { UIMessage } from "@ai-sdk/ui-utils";
 
 export const Message = ({ id, role, parts }: UIMessage) => {
   return (
-    <div key={id} className="flex items-start gap-2">
-      <div>
+    <div key={id} className="flex items-start gap-2 w-full">
+      <div className="flex-shrink-0">
         {role === "user" ? (
           <User className="size-4 mt-6 mr-6" />
         ) : (
           <Sparkle className="size-4 mt-6 mr-6" />
         )}
       </div>
-      <div>
+      <div className="flex-grow overflow-hidden w-full max-w-full">
         {parts?.map((part, index) => {
           if (part.type === "reasoning") {
             return (
@@ -38,7 +38,7 @@ export const Message = ({ id, role, parts }: UIMessage) => {
                       <span>Reasoning</span>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="p-3 bg-secondary/20 rounded-b-md">
+                  <AccordionContent className="p-3 bg-secondary/20 rounded-b-md overflow-hidden">
                     <MemoizedMarkdown
                       id={`${id}-reasoning-${index}`}
                       content={part.reasoning}
@@ -50,7 +50,7 @@ export const Message = ({ id, role, parts }: UIMessage) => {
           }
           if (part.type === "text") {
             return (
-              <div key={`text-${index}`} className="prose prose-sm max-w-none">
+              <div key={`text-${index}`} className="prose prose-sm w-full max-w-full overflow-hidden">
                 <MemoizedMarkdown
                   id={`${id}-text-${index}`}
                   content={part.text}

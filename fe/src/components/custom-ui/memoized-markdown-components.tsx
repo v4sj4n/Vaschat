@@ -18,7 +18,8 @@ const markdownComponents: Components = {
   h1: ({ children, ...props }: ComponentProps) => (
     <h1
       className={cn(
-        "text-3xl font-bold mt-8 mb-4 text-primary border-b-2 border-border pb-2"
+        "text-3xl font-bold mt-8 mb-4 text-primary border-b-2 border-border pb-2",
+        "break-words overflow-hidden"
       )}
       {...props}
     >
@@ -26,13 +27,22 @@ const markdownComponents: Components = {
     </h1>
   ),
   h2: ({ children, ...props }: ComponentProps) => (
-    <h2 className={cn("text-2xl font-bold mt-6 mb-3 text-primary")} {...props}>
+    <h2 
+      className={cn(
+        "text-2xl font-bold mt-6 mb-3 text-primary",
+        "break-words overflow-hidden"
+      )} 
+      {...props}
+    >
       {children}
     </h2>
   ),
   h3: ({ children, ...props }: ComponentProps) => (
     <h3
-      className={cn("text-xl font-bold mt-5 mb-2 text-primary/90")}
+      className={cn(
+        "text-xl font-bold mt-5 mb-2 text-primary/90",
+        "break-words overflow-hidden"
+      )}
       {...props}
     >
       {children}
@@ -40,7 +50,10 @@ const markdownComponents: Components = {
   ),
   h4: ({ children, ...props }: ComponentProps) => (
     <h4
-      className={cn("text-lg font-bold mt-4 mb-2 text-primary/80")}
+      className={cn(
+        "text-lg font-bold mt-4 mb-2 text-primary/80",
+        "break-words overflow-hidden"
+      )}
       {...props}
     >
       {children}
@@ -50,7 +63,10 @@ const markdownComponents: Components = {
   // Paragraphs
   p: ({ children, ...props }: ComponentProps) => (
     <p
-      className={cn("my-4 leading-relaxed text-foreground text-lg")}
+      className={cn(
+        "my-4 leading-relaxed text-foreground text-lg",
+        "break-words overflow-wrap-anywhere"
+      )}
       {...props}
     >
       {children}
@@ -62,9 +78,12 @@ const markdownComponents: Components = {
     <a
       className={cn(
         "text-primary-foreground bg-primary/90 px-1 rounded-sm",
-        "hover:bg-primary transition-colors duration-200"
+        "hover:bg-primary transition-colors duration-200",
+        "break-words overflow-wrap-anywhere"
       )}
       {...props}
+      rel="noopener noreferrer"
+      target="_blank"
     >
       {children}
     </a>
@@ -73,7 +92,10 @@ const markdownComponents: Components = {
   // Lists
   ul: ({ children, ...props }: ComponentProps) => (
     <ul
-      className={cn("my-4 ml-6 list-disc space-y-2 text-foreground")}
+      className={cn(
+        "my-4 ml-6 list-disc space-y-2 text-foreground",
+        "break-words overflow-wrap-anywhere"
+      )}
       {...props}
     >
       {children}
@@ -81,14 +103,23 @@ const markdownComponents: Components = {
   ),
   ol: ({ children, ...props }: ComponentProps) => (
     <ol
-      className={cn("my-4 ml-6 list-decimal space-y-2 text-foreground")}
+      className={cn(
+        "my-4 ml-6 list-decimal space-y-2 text-foreground",
+        "break-words overflow-wrap-anywhere"
+      )}
       {...props}
     >
       {children}
     </ol>
   ),
   li: ({ children, ...props }: ComponentProps) => (
-    <li className={cn("ml-2 text-lg")} {...props}>
+    <li 
+      className={cn(
+        "ml-2 text-lg",
+        "break-words overflow-wrap-anywhere"
+      )} 
+      {...props}
+    >
       {children}
     </li>
   ),
@@ -98,7 +129,8 @@ const markdownComponents: Components = {
     <blockquote
       className={cn(
         "border-l-4 border-primary/50 pl-4 py-2 my-6",
-        "bg-secondary text-secondary-foreground rounded-r-md italic"
+        "bg-secondary text-secondary-foreground rounded-r-md italic",
+        "break-words overflow-wrap-anywhere"
       )}
       {...props}
     >
@@ -108,13 +140,18 @@ const markdownComponents: Components = {
 
   // Code blocks and inline code
   code: ({ inline, className, children, ...props }: CodeProps) => {
+    const match = /language-(\w+)/.exec(className || "");
+    const language = match ? match[1] : "";
+    
     return !inline ? (
       <code
         className={cn(
           className,
           "block text-sm rounded-md p-4 bg-card text-card-foreground",
-          "overflow-x-auto border border-border"
+          "overflow-x-auto whitespace-pre-wrap break-words w-full",
+          "border border-border"
         )}
+        data-language={language}
         {...props}
       >
         {children}
@@ -123,7 +160,7 @@ const markdownComponents: Components = {
       <code
         className={cn(
           "px-1.5 py-0.5 rounded-sm bg-muted text-muted-foreground",
-          "font-mono text-sm mx-0.5"
+          "font-mono text-sm mx-0.5 break-words overflow-wrap-anywhere"
         )}
         {...props}
       >
@@ -134,7 +171,8 @@ const markdownComponents: Components = {
   pre: ({ children, ...props }: ComponentProps) => (
     <pre
       className={cn(
-        "my-6 rounded-md overflow-hidden shadow-md border border-border"
+        "my-6 rounded-md overflow-hidden shadow-md border border-border",
+        "w-full max-w-full"
       )}
       {...props}
     >
@@ -151,16 +189,18 @@ const markdownComponents: Components = {
         "border border-border"
       )}
       {...props}
+      loading="lazy"
     />
   ),
 
   // Tables
   table: ({ children, ...props }: ComponentProps) => (
-    <div className="overflow-x-auto my-6">
+    <div className="overflow-x-auto my-6 w-full">
       <table
         className={cn(
           "min-w-full divide-y divide-border border border-border",
-          "rounded-md overflow-hidden shadow-sm"
+          "rounded-md overflow-hidden shadow-sm",
+          "table-auto"
         )}
         {...props}
       >
@@ -190,7 +230,7 @@ const markdownComponents: Components = {
     <th
       className={cn(
         "px-6 py-3 text-left text-xs font-medium text-muted-foreground",
-        "uppercase tracking-wider"
+        "uppercase tracking-wider break-words overflow-wrap-anywhere"
       )}
       {...props}
     >
@@ -199,7 +239,10 @@ const markdownComponents: Components = {
   ),
   td: ({ children, ...props }: ComponentProps) => (
     <td
-      className={cn("px-6 py-4 whitespace-nowrap text-sm text-foreground")}
+      className={cn(
+        "px-6 py-4 text-sm text-foreground",
+        "break-words overflow-wrap-anywhere"
+      )}
       {...props}
     >
       {children}
@@ -216,7 +259,13 @@ const markdownComponents: Components = {
 
   // Custom Bold
   strong: ({ children, ...props }: ComponentProps) => (
-    <strong className={cn("font-extrabold text-lg text-primary")} {...props}>
+    <strong 
+      className={cn(
+        "font-extrabold text-lg text-primary",
+        "break-words overflow-wrap-anywhere"
+      )} 
+      {...props}
+    >
       {children}
     </strong>
   ),

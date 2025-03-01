@@ -16,15 +16,17 @@ function parseMarkdownIntoBlocks(markdown: string): string[] {
 const MemoizedMarkdownBlock = memo(
   ({ content }: { content: string }) => {
     return (
-      <ReactMarkdown
-        remarkPlugins={[remarkMath]}
-        rehypePlugins={[rehypeKatex, rehypeHighlight]}
-        components={{
-          ...markdownComponents,
-        }}
-      >
-        {content}
-      </ReactMarkdown>
+      <div className="w-full overflow-hidden break-words">
+        <ReactMarkdown
+          remarkPlugins={[remarkMath]}
+          rehypePlugins={[rehypeKatex, rehypeHighlight]}
+          components={{
+            ...markdownComponents,
+          }}
+        >
+          {content}
+        </ReactMarkdown>
+      </div>
     );
   },
   (prevProps, nextProps) => prevProps.content === nextProps.content
@@ -35,9 +37,13 @@ export const MemoizedMarkdown = memo(
   ({ content, id }: { content: string; id: string }) => {
     const blocks = useMemo(() => parseMarkdownIntoBlocks(content), [content]);
 
-    return blocks.map((block, index) => (
-      <MemoizedMarkdownBlock content={block} key={`${id}-block_${index}`} />
-    ));
+    return (
+      <div className="w-full max-w-full overflow-hidden">
+        {blocks.map((block, index) => (
+          <MemoizedMarkdownBlock content={block} key={`${id}-block_${index}`} />
+        ))}
+      </div>
+    );
   }
 );
 MemoizedMarkdown.displayName = "MemoizedMarkdown";
