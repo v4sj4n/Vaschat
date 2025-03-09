@@ -1,0 +1,45 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String                 @id @default(uuid())
+  name                  String
+  email                 String                 @unique
+  image                 String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  modelProviderUserKeys ModelProviderUserKey[]
+
+  @@index([email])
+}
+
+model ModelProvider {
+  id                    String                 @id @default(cuid())
+  name                  String
+  slug                  String                 @unique
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  modelProviderUserKeys ModelProviderUserKey[]
+
+  @@index([name])
+}
+
+model ModelProviderUserKey {
+  id              String        @id @default(cuid())
+  modelProviderId String
+  modelProvider   ModelProvider @relation(fields: [modelProviderId], references: [id])
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  apiKey          String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@unique([modelProviderId, userId])
+}

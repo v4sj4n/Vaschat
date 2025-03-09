@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Settings, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const generateInitials = (name?: string | null): string => {
   if (!name?.trim()) return "??";
@@ -19,42 +20,48 @@ const generateInitials = (name?: string | null): string => {
     .join("");
 };
 
-interface NavbarProps {
-  appName?: string;
-}
-
-export const Navbar = ({ appName = "My App" }: NavbarProps) => {
+export const Navbar = () => {
   const { data: session } = useSession();
+  const router = useRouter();
+
+  const handleSettingsClick = () => {
+    router.push("/settings");
+  };
 
   return (
-    <header className="flex items-center justify-between h-16 px-16 py-4">
-      <h1 className="text-2xl font-bold">{appName}</h1>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Avatar className="cursor-pointer">
-            <AvatarImage
-              src={session?.user?.image ?? undefined}
-              alt="User avatar"
-            />
-            <AvatarFallback>
-              {generateInitials(session?.user?.name)}
-            </AvatarFallback>
-          </Avatar>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem className="cursor-pointer">
-            <Settings className="mr-2 h-4 w-4" />
-            Settings
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className="cursor-pointer"
-            onClick={() => signOut()}
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <header className="flex justify-center h-16 px-16 py-4">
+      <div className="max-w-3xl w-full flex justify-between">
+        <h1 className="text-2xl font-bold">VasChat</h1>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Avatar className="cursor-pointer">
+              <AvatarImage
+                src={session?.user?.image ?? undefined}
+                alt="User avatar"
+              />
+              <AvatarFallback>
+                {generateInitials(session?.user?.name)}
+              </AvatarFallback>
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem 
+              className="cursor-pointer" 
+              onClick={handleSettingsClick}
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => signOut()}
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </header>
   );
 };
